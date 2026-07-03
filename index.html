@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Branch Office VLAN Segmentation Lab</title>
+  <meta name="description" content="GitHub Pages portfolio page for a Cisco Packet Tracer branch office VLAN segmentation lab using router-on-a-stick and ACLs." />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=zodiak@500,700&display=swap" rel="stylesheet" />
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+      --space-20: 5rem;
+      --color-bg: #f7f6f2;
+      --color-surface: #f9f8f5;
+      --color-surface-2: #fbfbf9;
+      --color-surface-offset: #f3f0ec;
+      --color-border: #d4d1ca;
+      --color-divider: #dcd9d5;
+      --color-text: #28251d;
+      --color-text-muted: #6f6c67;
+      --color-text-faint: #a8a59f;
+      --color-text-inverse: #f9f8f4;
+      --color-primary: #01696f;
+      --color-primary-hover: #0c4e54;
+      --shadow-sm: 0 1px 2px rgba(24, 22, 18, 0.06);
+      --shadow-md: 0 10px 30px rgba(24, 22, 18, 0.09);
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --content-default: 1080px;
+      --font-display: 'Zodiak', Georgia, serif;
+      --font-body: 'General Sans', Inter, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #171614;
+      --color-surface: #1c1b19;
+      --color-surface-2: #201f1d;
+      --color-surface-offset: #22211f;
+      --color-border: #393836;
+      --color-divider: #2b2a28;
+      --color-text: #d2d0cb;
+      --color-text-muted: #9a9792;
+      --color-text-faint: #6f6c67;
+      --color-text-inverse: #1f1d1a;
+      --color-primary: #4f98a3;
+      --color-primary-hover: #66aebb;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.22);
+      --shadow-md: 0 12px 30px rgba(0,0,0,.28);
+    }
+
+    * , *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      color: var(--color-text);
+      background: var(--color-bg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    img { display: block; max-width: 100%; height: auto; background: var(--color-surface-offset); }
+    a { color: inherit; }
+    p { max-width: 72ch; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      text-align: left;
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--color-divider);
+      vertical-align: top;
+    }
+    th { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 600; }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+    pre {
+      margin: 0;
+      padding: var(--space-4);
+      overflow-x: auto;
+      background: var(--color-surface-offset);
+      border: 1px solid rgba(40,37,29,.1);
+      border-radius: var(--radius-lg);
+    }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+    }
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+      z-index: 1000;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      background: var(--color-primary);
+      color: var(--color-text-inverse);
+    }
+    .container {
+      width: min(calc(100% - 2rem), var(--content-default));
+      margin-inline: auto;
+    }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      min-height: 72px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid rgba(40,37,29,.12);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-sm);
+    }
+    .brand svg { width: 22px; height: 22px; }
+    .nav-links {
+      display: none;
+      gap: 1rem;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+    .nav-links a:hover { color: var(--color-text); }
+    .theme-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(40,37,29,.12);
+      display: inline-grid;
+      place-items: center;
+      background: var(--color-surface);
+      color: var(--color-text);
+      box-shadow: var(--shadow-sm);
+    }
+    .hero {
+      padding: clamp(4rem, 8vw, 7rem) 0 clamp(2.5rem, 4vw, 4rem);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.42rem 0.8rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+      color: var(--color-primary);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.08;
+    }
+    h1 {
+      margin-top: var(--space-5);
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      max-width: 14ch;
+    }
+    .hero-copy {
+      margin-top: var(--space-5);
+      color: var(--color-text-muted);
+      max-width: 65ch;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-top: var(--space-6);
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0.85rem 1.1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .button-primary {
+      background: var(--color-primary);
+      color: var(--color-text-inverse);
+    }
+    .button-primary:hover { background: var(--color-primary-hover); }
+    .button-secondary {
+      background: var(--color-surface);
+      border-color: rgba(40,37,29,.12);
+    }
+    .hero-grid {
+      display: grid;
+      gap: var(--space-6);
+      margin-top: var(--space-10);
+      align-items: start;
+    }
+    .panel {
+      background: var(--color-surface);
+      border: 1px solid rgba(40,37,29,.1);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+    .panel-pad { padding: clamp(1.1rem, 2vw, 1.5rem); }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+    .metric {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-offset);
+      border: 1px solid rgba(40,37,29,.08);
+    }
+    .metric-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      line-height: 1;
+    }
+    .metric-label {
+      margin-top: 0.45rem;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+    .section {
+      padding: clamp(2rem, 5vw, 4rem) 0;
+    }
+    .section h2 {
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-3);
+      font-family: var(--font-display);
+    }
+    .section-intro {
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-6);
+    }
+    .grid-2 {
+      display: grid;
+      gap: var(--space-6);
+    }
+    .card-grid {
+      display: grid;
+      gap: var(--space-4);
+    }
+    .card {
+      padding: var(--space-5);
+      background: var(--color-surface);
+      border: 1px solid rgba(40,37,29,.1);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    .card h3 {
+      font-size: var(--text-lg);
+      margin-bottom: 0.55rem;
+    }
+    .card p, .card li { color: var(--color-text-muted); }
+    .card ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+    .image-frame {
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(40,37,29,.1);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-md);
+    }
+    .caption {
+      padding: 0.85rem 1rem 1rem;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      border-top: 1px solid var(--color-divider);
+    }
+    .kicker {
+      color: var(--color-primary);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.65rem;
+    }
+    .code-block + .code-block { margin-top: var(--space-4); }
+    .footer {
+      padding: var(--space-10) 0 var(--space-12);
+      color: var(--color-text-muted);
+      border-top: 1px solid var(--color-divider);
+    }
+    .footer a { color: var(--color-primary); }
+    .muted { color: var(--color-text-muted); }
+
+    @media (min-width: 760px) {
+      .nav-links { display: inline-flex; }
+      .hero-grid,
+      .grid-2 {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+      .card-grid.two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="#top" aria-label="Branch Office VLAN Segmentation Lab home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-label="Network topology logo">
+            <rect x="3" y="4" width="7" height="5" rx="1.2"></rect>
+            <rect x="14" y="4" width="7" height="5" rx="1.2"></rect>
+            <rect x="8.5" y="15" width="7" height="5" rx="1.2"></rect>
+            <path d="M6.5 9v3h11V9"></path>
+            <path d="M12 12v3"></path>
+          </svg>
+        </span>
+        <span>Branch Office VLAN Lab</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#topology">Topology</a>
+        <a href="#addressing">Addressing</a>
+        <a href="#configs">Configs</a>
+        <a href="#verification">Verification</a>
+      </nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme"></button>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="hero container" id="top">
+      <span class="eyebrow">Cisco Packet Tracer Portfolio Project</span>
+      <div class="hero-grid">
+        <div>
+          <h1>Branch office network lab with VLAN segmentation, router-on-a-stick, and ACL enforcement.</h1>
+          <p class="hero-copy">This GitHub Pages project documents a small office network built to demonstrate practical CCNA-level skills: VLAN creation, 802.1Q trunking, inter-VLAN routing through router subinterfaces, and controlled guest isolation from internal server resources.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#configs">View configurations</a>
+            <a class="button button-secondary" href="#verification">See test results</a>
+          </div>
+        </div>
+        <aside class="panel panel-pad" aria-label="Project summary">
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-value">3</div>
+              <div class="metric-label">Production VLANs</div>
+            </div>
+            <div class="metric">
+              <div class="metric-value">2</div>
+              <div class="metric-label">Trunk links</div>
+            </div>
+            <div class="metric">
+              <div class="metric-value">1</div>
+              <div class="metric-label">Extended ACL</div>
+            </div>
+            <div class="metric">
+              <div class="metric-value">6</div>
+              <div class="metric-label">Endpoints in lab</div>
+            </div>
+          </div>
+          <p class="muted" style="margin-top: 1rem;">Recommended repository contents: this HTML page, a README, the Packet Tracer file, sanitized device configs, topology PNG, and verification screenshots.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section container" id="topology">
+      <div class="grid-2">
+        <div>
+          <div class="kicker">Topology</div>
+          <h2>Small branch office layout</h2>
+          <p class="section-intro">R1 connects to SW1 over a trunk, and SW1 extends VLANs to SW2 over a second trunk. User devices sit in VLAN 10, the internal server sits in VLAN 20, and the guest endpoint sits in VLAN 30.</p>
+          <div class="card-grid two-col">
+            <article class="card">
+              <h3>Core devices</h3>
+              <ul>
+                <li>R1 router with subinterfaces on G0/0</li>
+                <li>SW1 as the primary access and trunk switch</li>
+                <li>SW2 as the downstream access switch</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Endpoint placement</h3>
+              <ul>
+                <li>PC1 and PC2 on SW1 in VLAN 10</li>
+                <li>PC3 and PC4 on SW2 in VLAN 10</li>
+                <li>Server1 on SW1 in VLAN 20; Guest-PC on SW2 in VLAN 30</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+        <figure class="image-frame">
+          <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/96f5d25f-bcaf-4412-ab5e-dd8da11c8594.png" alt="Network topology diagram showing R1, SW1, SW2, users VLAN, server VLAN, and guest VLAN connections." width="1600" height="900" loading="lazy" decoding="async" />
+          <figcaption class="caption">Topology diagram for the branch office VLAN segmentation lab.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section container" id="addressing">
+      <div class="kicker">Addressing</div>
+      <h2>VLAN and IP plan</h2>
+      <p class="section-intro">The lab uses simple /24 networks so the routing logic stays easy to validate and explain in a portfolio review.</p>
+      <div class="panel panel-pad">
+        <table>
+          <thead>
+            <tr>
+              <th>VLAN</th>
+              <th>Name</th>
+              <th>Subnet</th>
+              <th>Gateway</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10</td>
+              <td>USERS</td>
+              <td>192.168.10.0/24</td>
+              <td>192.168.10.1</td>
+              <td>Employee endpoints</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>SERVERS</td>
+              <td>192.168.20.0/24</td>
+              <td>192.168.20.1</td>
+              <td>Internal server segment</td>
+            </tr>
+            <tr>
+              <td>30</td>
+              <td>GUEST</td>
+              <td>192.168.30.0/24</td>
+              <td>192.168.30.1</td>
+              <td>Guest access</td>
+            </tr>
+            <tr>
+              <td>99</td>
+              <td>MGMT</td>
+              <td>192.168.99.0/24</td>
+              <td>192.168.99.1</td>
+              <td>Optional management</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section container" id="ports">
+      <div class="kicker">Ports</div>
+      <h2>Switch port assignments</h2>
+      <div class="card-grid two-col">
+        <article class="card">
+          <h3>SW1</h3>
+          <ul>
+            <li>Fa0/1 → PC1 → VLAN 10</li>
+            <li>Fa0/2 → PC2 → VLAN 10</li>
+            <li>Fa0/10 → Server1 → VLAN 20</li>
+            <li>Fa0/23 → trunk to SW2</li>
+            <li>Fa0/24 → trunk to R1</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>SW2</h3>
+          <ul>
+            <li>Fa0/1 → PC3 → VLAN 10</li>
+            <li>Fa0/2 → PC4 → VLAN 10</li>
+            <li>Fa0/10 → Guest-PC → VLAN 30</li>
+            <li>Fa0/24 → trunk to SW1</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section container" id="configs">
+      <div class="kicker">Configurations</div>
+      <h2>Core device configuration examples</h2>
+      <p class="section-intro">These snippets are sized for a portfolio page. In the repository, keep full device configs in a separate <code>configs/</code> folder.</p>
+      <div class="card-grid">
+        <article class="card code-block">
+          <h3>SW1</h3>
+<pre><code>enable
+configure terminal
+hostname SW1
+
+vlan 10
+ name USERS
+vlan 20
+ name SERVERS
+vlan 30
+ name GUEST
+vlan 99
+ name MGMT
+
+interface range fa0/1 - 2
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ no shutdown
+
+interface fa0/10
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+ no shutdown
+
+interface fa0/23
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown
+
+interface fa0/24
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ no shutdown</code></pre>
+        </article>
+        <article class="card code-block">
+          <h3>R1</h3>
+<pre><code>enable
+configure terminal
+hostname R1
+
+interface g0/0
+ no ip address
+ no shutdown
+
+interface g0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+
+interface g0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+
+interface g0/0.30
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+
+ip access-list extended GUEST_BLOCK_SERVERS
+ deny ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+ permit ip any any
+
+interface g0/0.30
+ ip access-group GUEST_BLOCK_SERVERS in</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="section container" id="verification">
+      <div class="kicker">Validation</div>
+      <h2>Verification and expected results</h2>
+      <div class="grid-2">
+        <article class="card">
+          <h3>Show commands</h3>
+<pre><code>show vlan brief
+show interfaces trunk
+show interfaces status
+show ip interface brief
+show ip route
+show access-lists</code></pre>
+          <p>These commands confirm VLAN membership, trunk state, subinterface status, routing table entries, and ACL logic.</p>
+        </article>
+        <article class="card">
+          <h3>Ping tests</h3>
+          <ul>
+            <li>PC1 to Server1: should succeed</li>
+            <li>PC3 to PC1: should succeed</li>
+            <li>Guest-PC to 192.168.30.1: should succeed</li>
+            <li>Guest-PC to Server1: should fail</li>
+          </ul>
+          <p>Showing both permitted and blocked traffic makes the project much stronger for interviews and resume discussions.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section container" id="repo">
+      <div class="kicker">Repository</div>
+      <h2>Suggested GitHub structure</h2>
+      <article class="panel panel-pad">
+<pre><code>branch-office-vlan-segmentation-lab/
+├── index.html
+├── README.md
+├── branch-office-vlan-segmentation-lab.pkt
+├── topology.png
+├── configs/
+│   ├── R1.txt
+│   ├── SW1.txt
+│   └── SW2.txt
+└── screenshots/
+    ├── show-vlan-brief-sw1.png
+    ├── show-interfaces-trunk-sw1.png
+    ├── show-ip-interface-brief-r1.png
+    ├── guest-to-server-blocked.png
+    └── user-to-server-success.png</code></pre>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>This page is designed for GitHub Pages hosting as a static project portfolio entry. Rename the file to <code>index.html</code> before uploading it to your repository root.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const toggle = document.querySelector('[data-theme-toggle]');
+      const root = document.documentElement;
+      let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+      function renderIcon(mode) {
+        toggle.innerHTML = mode === 'dark'
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+        toggle.setAttribute('aria-label', mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      }
+
+      function apply(mode) {
+        root.setAttribute('data-theme', mode);
+        renderIcon(mode);
+      }
+
+      apply(theme);
+      toggle.addEventListener('click', function () {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        apply(theme);
+      });
+    })();
+  </script>
+</body>
+</html>
