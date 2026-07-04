@@ -407,7 +407,7 @@
               <div class="metric-label">Endpoints in lab</div>
             </div>
           </div>
-          <p class="muted" style="margin-top: 1rem;">Recommended repository contents: this HTML page, a README, the Packet Tracer file, sanitized device configs, topology PNG, and verification screenshots.</p>
+          <p class="muted" style="margin-top: 1rem;">Devices and endpoints details.</p>
         </aside>
       </div>
     </section>
@@ -446,7 +446,7 @@
 
     <section class="section container" id="addressing">
       <div class="kicker">Addressing</div>
-      <h2>VLAN and IP plan</h2>
+      <h2>VLAN and IP's</h2>
       <p class="section-intro">The lab uses simple /24 networks so the routing logic stays easy to validate and explain in a portfolio review.</p>
       <div class="panel panel-pad">
         <table>
@@ -513,7 +513,7 @@
             <li>Fa0/1 → PC3 → VLAN 10</li>
             <li>Fa0/2 → PC4 → VLAN 10</li>
             <li>Fa0/10 → Guest-PC → VLAN 30</li>
-            <li>Fa0/24 → trunk to SW1</li>
+            <li>Fa0/23 → trunk to SW1</li>
           </ul>
         </article>
       </div>
@@ -522,7 +522,7 @@
     <section class="section container" id="configs">
       <div class="kicker">Configurations</div>
       <h2>Core device configuration examples</h2>
-      <p class="section-intro">These snippets are sized for a portfolio page. In the repository, keep full device configs in a separate <code>configs/</code> folder.</p>
+      <p class="section-intro">These snippets are sized for a portfolio page. <code>configs/</code> folder.</p>
       <div class="card-grid">
         <article class="card code-block">
           <h3>SW1</h3>
@@ -543,23 +543,48 @@ interface range fa0/1 - 2
  switchport mode access
  switchport access vlan 10
  spanning-tree portfast
- no shutdown
 
 interface fa0/10
  switchport mode access
  switchport access vlan 20
  spanning-tree portfast
- no shutdown
 
 interface fa0/23
  switchport mode trunk
  switchport trunk allowed vlan 10,20,30,99
- no shutdown
 
 interface fa0/24
  switchport mode trunk
- switchport trunk allowed vlan 10,20,30,99
- no shutdown</code></pre>
+ switchport trunk allowed vlan 10,20,30,99</code></pre>
+<article class="card code-block">
+          <h3>SW2</h3>
+<pre><code>enable
+configure terminal
+hostname SW2
+
+vlan 10
+ name USERS
+vlan 20
+ name SERVERS
+vlan 30
+ name GUEST
+vlan 99
+ name MGMT
+
+interface range fa0/1 - 2
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+
+interface fa0/10
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+
+interface fa0/23
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99</code></pre>
+
         </article>
         <article class="card code-block">
           <h3>R1</h3>
