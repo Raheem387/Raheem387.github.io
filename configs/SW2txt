@@ -1,0 +1,27 @@
+enable
+configure terminal
+hostname SW2
+
+vlan 10
+    name USERS
+vlan 20
+    name SERVERS
+vlan 30
+    name GUEST
+vlan 99
+    name MGMT   
+
+interface range f0/1 - 2
+    switchport mode access
+    switchport access vlan 10
+    spanning-tree portfast
+
+interface f0/10
+    switchport mode access
+    switchport access vlan 30
+    spanning-tree portfast
+
+interface f0/23
+    switchport mode trunk
+    switchport trunk allowed vlan 10,20,30,99
+    switchport trunk native vlan 1001
